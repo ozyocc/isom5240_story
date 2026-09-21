@@ -1,3 +1,4 @@
+# import part
 import streamlit as st
 from PIL import Image
 from transformers import pipeline, BlipProcessor, BlipForConditionalGeneration
@@ -18,7 +19,7 @@ st.title("🎨 Magic Picture Storyteller")
 st.write("Upload a picture, and let's create a fun story together!")
 
 # ==========================================
-# 2. MODEL LOADING (CACHED)
+# 2. MODEL LOADING : Caption and Story
 # ==========================================
 @st.cache_resource
 def load_caption_model():
@@ -36,8 +37,9 @@ processor, blip_model = load_caption_model()
 story_pipe = load_story_pipeline()
 
 # ==========================================
-# 3. CORE PROCESSING FUNCTIONS
+# 3. CORE PROCESSING FUNCTIONS 
 # ==========================================
+# caption function
 def generate_caption(image: Image.Image) -> str:
     """Generates an image caption using native BLIP classes."""
     inputs = processor(image, return_tensors="pt")
@@ -45,6 +47,7 @@ def generate_caption(image: Image.Image) -> str:
     caption = processor.decode(out[0], skip_special_tokens=True)
     return caption
 
+# story function
 def generate_child_story(caption: str) -> str:
     """
     Expands an image caption into a non-repetitive child-friendly story 
@@ -100,6 +103,7 @@ def generate_child_story(caption: str) -> str:
         
     return story
 
+# text to speech function 
 def text_to_speech(text: str) -> io.BytesIO:
     """Converts input text into an MP3 audio stream using gTTS."""
     tts = gTTS(text=text, lang='en', slow=False)
@@ -144,7 +148,7 @@ if uploaded_file is not None:
             story = generate_child_story(caption)
             word_count = len(story.split())
             
-            st.subheader("📖 Story Time:")
+            st.subheader("📖 Now Story Time:")
             st.write(story)
             st.caption(f"📏 **Word Count:** {word_count} words")
             
